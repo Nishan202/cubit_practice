@@ -1,12 +1,16 @@
+import 'package:cubit_practice/DB/data_model.dart';
+import 'package:cubit_practice/DB/db_helper.dart';
 import 'package:cubit_practice/counter_cubit.dart';
 import 'package:cubit_practice/home.dart';
-import 'package:cubit_practice/list/list_cubit.dart';
+import 'package:cubit_practice/state_management/db/db_cubit.dart';
+import 'package:cubit_practice/state_management/list/list_cubit.dart';
 import 'package:cubit_practice/note_home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() {
-  runApp(BlocProvider(create: (context) => ListCubit(), child: MyApp(),));
+  // runApp(BlocProvider(create: (context) => ListCubit(), child: MyApp(),));
+  runApp(BlocProvider(create: (context) => DbCubit(dbHelper: DBHelper.getInstense()), child: MyApp(),));
 }
 
 class MyApp extends StatelessWidget {

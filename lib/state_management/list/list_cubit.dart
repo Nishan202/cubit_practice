@@ -1,4 +1,4 @@
-import 'package:cubit_practice/list/list_state_cubit.dart';
+import 'package:cubit_practice/state_management/list/list_state_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ListCubit extends Cubit<ListStateCubit>{

@@ -1,22 +1,35 @@
+import 'package:cubit_practice/DB/data_model.dart';
 import 'package:cubit_practice/add_note.dart';
 import 'package:cubit_practice/counter_cubit.dart';
-import 'package:cubit_practice/list/list_cubit.dart';
-import 'package:cubit_practice/list/list_cubit.dart';
-import 'package:cubit_practice/list/list_state_cubit.dart';
+import 'package:cubit_practice/state_management/db/db_cubit.dart';
+import 'package:cubit_practice/state_management/db/db_state_cubit.dart';
+import 'package:cubit_practice/state_management/list/list_cubit.dart';
+import 'package:cubit_practice/state_management/list/list_cubit.dart';
+import 'package:cubit_practice/state_management/list/list_state_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class NoteHome extends StatelessWidget {
-  // const NoteHome({super.key});
+class NoteHome extends StatefulWidget {
+  @override
+  State<NoteHome> createState() => _NoteHomeState();
+}
 
-  List<Map<String, dynamic>> allData = [];
+class _NoteHomeState extends State<NoteHome> {
+  // const NoteHome({super.key});
+  // List<Map<String, dynamic>> allData = [];
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<DbCubit>().fetchInitialData();
+  }
 
   @override
   Widget build(BuildContext context) {
 
     TextEditingController titleController = TextEditingController();
     TextEditingController desController = TextEditingController();
-print('Main context called');
+// print('Main context called');
     // allData = context.watch<ListCubit>().state.data;
     // allData = BlocProvider.of<ListCubit>(context).state.data;
 
@@ -24,23 +37,23 @@ print('Main context called');
       appBar: AppBar(
         title: const Text('Notes'),
       ),
-      body: BlocBuilder<ListCubit, ListStateCubit>(builder: (ctx, state){
-        allData = state.data;
+      body: BlocBuilder<DbCubit, DbStateCubit>(builder: (ctx, state){
+        var allData = state.dataModel;
         print('inner context called');
         return allData.isNotEmpty ? ListView.builder(
           itemCount: allData.length,
           itemBuilder: (_, index) {
             return ListTile(
-              title: Text(allData[index][ListCubit.NOTE_TITLE], style: TextStyle(fontSize: 25, color: Colors.black),),
-              subtitle: Text(allData[index][ListCubit.NOTE_DESC], style: TextStyle(fontSize: 20, color: Colors.grey),),
+              title: Text(allData[index].title, style: TextStyle(fontSize: 25, color: Colors.black),),
+              subtitle: Text(allData[index].description, style: TextStyle(fontSize: 20, color: Colors.grey),),
               trailing: SizedBox(
                 width: 100,
                 child: Row(
                   children: [
                     IconButton(
                       onPressed: () {    
-                        titleController.text = allData[index][ListCubit.NOTE_TITLE];
-                        desController.text = allData[index][ListCubit.NOTE_DESC];
+                        titleController.text = allData[index].title;
+                        desController.text = allData[index].description;
                         // Navigator.push(
                         //   context,
                         //   MaterialPageRoute(
@@ -111,8 +124,11 @@ print('Main context called');
                                     children: [
                                       OutlinedButton(
                                         onPressed: () {
-                                          // using cubit
-                                          BlocProvider.of<ListCubit>(ctx, listen: false).updateNote(updatedTitle: titleController.text, updatedDescription: desController.text, index: index);
+                                          // using list cubit
+                                          // BlocProvider.of<ListCubit>(ctx, listen: false).updateNote(updatedTitle: titleController.text, updatedDescription: desController.text, index: index);
+                                          
+                                          // using db cubit
+                                          BlocProvider.of<DbCubit>(ctx, listen: false).updateData(uData: DataModel(title: titleController.text, description: desController.text, id: allData[index].id));
                                               Navigator.pop(context);
                                         },
                                         child: const Text('Save'),
@@ -135,8 +151,11 @@ print('Main context called');
                     ),
                     IconButton(
                       onPressed: () {
-                        // Delete note through Cubit
-                        BlocProvider.of<ListCubit>(ctx, listen: false).removeNote(index: index);
+                        // Delete note through list Cubit
+                        // BlocProvider.of<ListCubit>(ctx, listen: false).removeNote(index: index);
+
+                        // Delete note through db cubit
+                        BlocProvider.of<DbCubit>(ctx, listen: false).deleteData(noteId: allData[index].id);
                       },
                       icon: const Icon(
                         Icons.delete,
